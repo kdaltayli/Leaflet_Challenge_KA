@@ -15,21 +15,9 @@
     function onEachFeature(feature, layer){
       layer.bindPopup(`<h3>${feature.properties.mag}</h3><hr><p>${feature.properties.place} and ${new Date(feature.properties.time)}</p>`);
     
-  console.log(feature.geometry.coordinates[2]);
+  // console.log(feature.geometry.coordinates[2]);
     }
 
-    function colorCircle(depth){
-      switch(true){
-        case depth>30:
-          return "green";
-        case depth>15:
-          return "red";
-        case depth>5:
-          return "yellow";
-        default:
-          return "blue";
-      }
-}
 //giving each feature Circle a popup describing the magnitude and time of the earhtquake
   function layerCircle(feature, latlng){
     // console.log(feature);
@@ -49,7 +37,23 @@
     //sending earthquakes layer to the create Map Function
     createMap(earthquakes);
   }
-
+  
+function colorCircle(depth){
+    switch(true){
+      case depth>90:
+        return "green";
+      case depth>70:
+        return "red";
+      case depth>50:
+        return "yellow";
+      case depth>30:
+        return "brown";
+      case depth>10:
+        return "purple";
+      default:
+        return "blue";
+    }
+} 
   function createMap(earthquakes){
 
    // Adding tile layer
@@ -67,7 +71,7 @@
 	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 });
 
-var dark = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+var dark = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", { 
   attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
   maxZoom: 18,
   id: "dark-v10",
@@ -96,4 +100,26 @@ var dark = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{
   L.control.layers(baseMaps,overlayMaps, {
     collapsed:false
   }).addTo(myMap);
+
+  //Legend 
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (map) {
+
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [-10, 10 , 30 , 50, 70, 90],
+        labels = [];
+
+    // loop through our density intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + colorCircle(grades[i] + 1) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    }
+
+    return div;
+};
+
+legend.addTo(myMap);
 }
+
